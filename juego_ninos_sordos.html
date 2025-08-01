@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Educativo para Niños Sordos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #87CEEB, #E6F3FF);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: #FF6B6B;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            margin: 20px;
+            animation: wave 2s infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .menu-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .game-button {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            color: white;
+            border: none;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+        }
+
+        .game-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .game-screen {
+            display: none;
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        /* Memoria Mágica Styles */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: linear-gradient(45deg, #FF9A9E, #FECFEF);
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border: 3px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: white;
+            flex-direction: column;
+        }
+
+        .card-image {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+
+        .card-word {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .card-sign {
+            font-size: 1.8em;
+            animation: signAnimation 2s infinite;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .sign-description {
+            font-size: 0.7em;
+            color: #666;
+            margin-top: 3px;
+            text-align: center;
+        }
+
+        @keyframes signAnimation {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Lluvia de Señitas Styles */
+        .rain-game {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB, #E6F3FF);
+            border-radius: 15px;
+        }
+
+        .target-word {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .bubble {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            animation: fall linear;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 3px solid white;
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .bubble-sign {
+            font-size: 1.3em;
+            animation: bubbleSign 2s infinite;
+        }
+
+        @keyframes bubbleSign {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        @keyframes fall {
+            from { top: -100px; }
+            to { top: 600px; }
+        }
+
+        .bubble.correct {
+            background: linear-gradient(45deg, #98FB98, #90EE90);
+        }
+
+        .bubble.incorrect {
+            background: linear-gradient(45deg, #FFB6C1, #FFA0B4);
+        }
+
+        .bubble.success {
+            background: #32CD32;
+            animation: none;
+            transform: scale(1.2);
+        }
+
+        .bubble.error {
+            background: #FF4444;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .score {
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #FFD700;
+            animation: confettiFall 3s linear;
+            pointer-events: none;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .back-button {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 20px;
+            transition: transform 0.3s;
+        }
+
+        .back-button:hover {
+            transform: scale(1.05);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #32CD32, #98FB98);
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        /* Spelling Game Styles */
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .letter-button {
+            aspect-ratio: 1;
+            background: linear-gradient(45deg, #FF9A9E, #FECFEF);
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .letter-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .letter-button.used {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .letter-button.correct {
+            background: linear-gradient(45deg, #32CD32, #98FB98);
+            animation: letterSuccess 0.5s;
+        }
+
+        .letter-sign {
+            font-size: 0.8em;
+            margin-top: 2px;
+        }
+
+        @keyframes letterSuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); background: #32CD32; }
+            100% { transform: scale(1); }
+        }
+
+        /* Family Game Styles */
+        .family-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .family-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid #ddd;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .family-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .family-card.correct {
+            border-color: #32CD32;
+            background: linear-gradient(45deg, #E8F5E8, #F0FFF0);
+            animation: correctPulse 0.5s;
+        }
+
+        .family-card.incorrect {
+            border-color: #FF4444;
+            background: linear-gradient(45deg, #FFE8E8, #FFF0F0);
+            animation: shake 0.5s;
+        }
+
+        .family-card.selected {
+            border-color: #4ECDC4;
+            background: linear-gradient(45deg, #E8F8F8, #F0FFFE);
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .family-emoji {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .family-word {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .family-sign {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .family-description {
+            font-size: 0.8em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Pantalla Principal -->
+        <div id="main-menu" class="game-screen active">
+            <div class="header">
+                <h1>🌟 JUEGOS LSEC 🌟</h1>
+                <div class="avatar">👋</div>
+                <p style="color: white; font-size: 1.2em;">¡Hola! Aprendamos Lengua de Señas Ecuatoriana</p>
+                <p style="color: white; font-size: 0.9em;">🇪🇨 Juegos educativos para niños sordos</p>
+            </div>
+            
+            <div class="menu-buttons">
+                <button class="game-button" onclick="startMemoryGame()">
+                    🧠 Memoria Mágica
+                </button>
+                <button class="game-button" onclick="startRainGame()">
+                    🫧 Lluvia de Señitas
+                </button>
+                <button class="game-button" onclick="startSpellingGame()">
+                    ✏️ Deletreo Mágico
+                </button>
+                <button class="game-button" onclick="startFamilyGame()">
+                    👨‍👩‍👧‍👦 Familias de Señas
+                </button>
+            </div>
+        </div>
+
+        <!-- Juego 1: Memoria Mágica -->
+        <div id="memory-game" class="game-screen">
+            <button class="back-button" onclick="showMainMenu()">← Volver</button>
+            <h2 style="color: #333; margin-bottom: 20px;">🧠 Memoria Mágica</h2>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="memory-progress" style="width: 0%"></div>
+            </div>
+            
+            <div class="score" id="memory-score">Puntos: 0</div>
+            <div class="memory-grid" id="memory-grid"></div>
+        </div>
+
+        <!-- Juego 2: Lluvia de Señitas -->
+        <div id="rain-game" class="game-screen">
+            <button class="back-button" onclick="showMainMenu()">← Volver</button>
+            <h2 style="color: #333; margin-bottom: 20px;">🫧 Lluvia de Señitas</h2>
+            
+            <div class="target-word" id="target-word">CASA</div>
+            <div class="score" id="rain-score">Puntos: 0</div>
+            
+            <div class="rain-game" id="rain-container"></div>
+        </div>
+
+        <!-- Juego 3: Deletreo Mágico -->
+        <div id="spelling-game" class="game-screen">
+            <button class="back-button" onclick="showMainMenu()">← Volver</button>
+            <h2 style="color: #333; margin-bottom: 20px;">✏️ Deletreo Mágico</h2>
+            
+            <div class="target-word" id="spelling-target">GATO</div>
+            <div class="score" id="spelling-score">Puntos: 0</div>
+            
+            <div style="margin: 20px 0;">
+                <div id="spelling-progress" style="font-size: 2em; color: #333; margin: 10px;">
+                    _ _ _ _
+                </div>
+            </div>
+            
+            <div class="alphabet-grid" id="alphabet-grid">
+                <!-- Alphabet buttons will be generated here -->
+            </div>
+        </div>
+
+        <!-- Juego 4: Familias de Señas -->
+        <div id="family-game" class="game-screen">
+            <button class="back-button" onclick="showMainMenu()">← Volver</button>
+            <h2 style="color: #333; margin-bottom: 20px;">👨‍👩‍👧‍👦 Familias de Señas</h2>
+            
+            <div class="target-word" id="family-category">FAMILIA</div>
+            <div class="score" id="family-score">Puntos: 0</div>
+            
+            <p style="color: #666; margin-bottom: 20px;">¡Encuentra todas las señas de la categoría!</p>
+            
+            <div class="family-grid" id="family-grid">
+                <!-- Family cards will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos del juego con señas auténticas LSEC (Lengua de Señas Ecuatoriana)
+        const gameData = {
+            casa: { 
+                emoji: '🏠', 
+                word: 'CASA', 
+                sign: '🏠🙌',
+                signDescription: 'Techo con manos',
+                category: 'lugares'
+            },
+            gato: { 
+                emoji: '🐱', 
+                word: 'GATO', 
+                sign: '😺👌',
+                signDescription: 'Bigotes con dedos',
+                category: 'animales'
+            },
+            agua: { 
+                emoji: '💧', 
+                word: 'AGUA', 
+                sign: '💧🤏',
+                signDescription: 'Gotear con dedos',
+                category: 'elementos'
+            },
+            sol: { 
+                emoji: '☀️', 
+                word: 'SOL', 
+                sign: '☀️⭕',
+                signDescription: 'Círculo brillante',
+                category: 'elementos'
+            },
+            libro: { 
+                emoji: '📚', 
+                word: 'LIBRO', 
+                sign: '📖🙏',
+                signDescription: 'Abrir como libro',
+                category: 'objetos'
+            },
+            mano: { 
+                emoji: '✋', 
+                word: 'MANO', 
+                sign: '✋👋',
+                signDescription: 'Mostrar palma',
+                category: 'cuerpo'
+            },
+            niño: { 
+                emoji: '👦', 
+                word: 'NIÑO', 
+                sign: '👶👃',
+                signDescription: 'Tocar nariz y girar',
+                category: 'familia'
+            },
+            niña: { 
+                emoji: '👧', 
+                word: 'NIÑA', 
+                sign: '👧👂',
+                signDescription: 'Tocar oreja y girar',
+                category: 'familia'
+            },
+            papá: { 
+                emoji: '👨', 
+                word: 'PAPÁ', 
+                sign: '👨💭',
+                signDescription: 'Mejilla y sien',
+                category: 'familia'
+            },
+            mamá: { 
+                emoji: '👩', 
+                word: 'MAMÁ', 
+                sign: '👩❤️',
+                signDescription: 'Corazón en pecho',
+                category: 'familia'
+            },
+            perro: { 
+                emoji: '🐕', 
+                word: 'PERRO', 
+                sign: '🐕🤚',
+                signDescription: 'Llamar con mano',
+                category: 'animales'
+            },
+            mesa: { 
+                emoji: '🪑', 
+                word: 'MESA', 
+                sign: '📋👐',
+                signDescription: 'Superficie plana',
+                category: 'objetos'
+            }
+        };
+
+        // Alfabeto Dactilográfico LSEC
+        const alphabet = {
+            A: { sign: '✊👍', description: 'Puño cerrado, pulgar al lado' },
+            B: { sign: '🖐️👌', description: 'Dedos juntos hacia arriba' },
+            C: { sign: '🤏🌙', description: 'Forma de C con dedos' },
+            D: { sign: '👉⭕', description: 'Índice arriba, otros curvos' },
+            E: { sign: '✊👇', description: 'Dedos curvos hacia abajo' },
+            F: { sign: '👌👍', description: 'OK con pulgar e índice' },
+            G: { sign: '👉👈', description: 'Índice horizontal' },
+            H: { sign: '✌️👈', description: 'Dos dedos horizontales' },
+            I: { sign: '🤙👆', description: 'Meñique hacia arriba' },
+            J: { sign: '🤙🔄', description: 'Meñique con movimiento' },
+            K: { sign: '✌️👍', description: 'Dos dedos con pulgar' },
+            L: { sign: '👍👉', description: 'L con pulgar e índice' },
+            M: { sign: '✊🤏', description: 'Tres dedos sobre pulgar' },
+            N: { sign: '✊👌', description: 'Dos dedos sobre pulgar' },
+            O: { sign: '⭕👌', description: 'Círculo con dedos' },
+            P: { sign: '✌️👇', description: 'Dos dedos hacia abajo' },
+            Q: { sign: '👌👇', description: 'OK hacia abajo' },
+            R: { sign: '✌️🤞', description: 'Dedos cruzados' },
+            S: { sign: '✊👊', description: 'Puño cerrado' },
+            T: { sign: '👍✊', description: 'Pulgar entre dedos' },
+            U: { sign: '✌️👆', description: 'Dos dedos juntos arriba' },
+            V: { sign: '✌️📐', description: 'Dos dedos separados' },
+            W: { sign: '🤟👆', description: 'Tres dedos arriba' },
+            X: { sign: '🤏🪝', description: 'Índice curvado' },
+            Y: { sign: '🤙👋', description: 'Pulgar y meñique' },
+            Z: { sign: '👉⚡', description: 'Movimiento de Z' }
+        };
+
+        // Categorías para el juego de familias
+        const categories = {
+            familia: {
+                name: 'FAMILIA',
+                emoji: '👨‍👩‍👧‍👦',
+                words: ['niño', 'niña', 'papá', 'mamá']
+            },
+            animales: {
+                name: 'ANIMALES',
+                emoji: '🐾',
+                words: ['gato', 'perro']
+            },
+            objetos: {
+                name: 'OBJETOS',
+                emoji: '🏠',
+                words: ['libro', 'mesa']
+            },
+            elementos: {
+                name: 'NATURALEZA',
+                emoji: '🌍',
+                words: ['agua', 'sol']
+            }
+        };
+
+        let memoryScore = 0;
+        let rainScore = 0;
+        let spellingScore = 0;
+        let familyScore = 0;
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let currentTargetWord = '';
+        let currentSpellingWord = '';
+        let spellingProgress = [];
+        let currentCategory = '';
+        let selectedFamilyCards = [];
+
+        // Funciones de navegación
+        function showMainMenu() {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('main-menu').classList.add('active');
+        }
+
+        function startMemoryGame() {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('memory-game').classList.add('active');
+            initMemoryGame();
+        }
+
+        function startRainGame() {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('rain-game').classList.add('active');
+            initRainGame();
+        }
+
+        function startSpellingGame() {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('spelling-game').classList.add('active');
+            initSpellingGame();
+        }
+
+        function startFamilyGame() {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('family-game').classList.add('active');
+            initFamilyGame();
+        }
+
+        // Juego de Memoria
+        function initMemoryGame() {
+            memoryScore = 0;
+            flippedCards = [];
+            matchedPairs = 0;
+            document.getElementById('memory-score').textContent = 'Puntos: 0';
+            
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            
+            // Seleccionar 6 palabras aleatorias
+            const words = Object.keys(gameData).slice(0, 6);
+            const cards = [...words, ...words]; // Duplicar para pares
+            
+            // Mezclar cartas
+            cards.sort(() => Math.random() - 0.5);
+            
+            cards.forEach((word, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.word = word;
+                card.innerHTML = `
+                    <div class="card-front">❓</div>
+                    <div class="card-back">
+                        <div class="card-image">${gameData[word].emoji}</div>
+                        <div class="card-word">${gameData[word].word}</div>
+                        <div class="card-sign">${gameData[word].sign}</div>
+                        <div class="sign-description">${gameData[word].signDescription}</div>
+                    </div>
+                `;
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(e) {
+            const card = e.currentTarget;
+            
+            if (card.classList.contains('flipped') || flippedCards.length >= 2) {
+                return;
+            }
+            
+            card.classList.add('flipped');
+            flippedCards.push(card);
+            
+            if (flippedCards.length === 2) {
+                setTimeout(checkMatch, 1000);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.word === card2.dataset.word) {
+                // ¡Coincidencia!
+                memoryScore += 10;
+                matchedPairs++;
+                createConfetti();
+                
+                // Actualizar progreso
+                const progress = (matchedPairs / 6) * 100;
+                document.getElementById('memory-progress').style.width = progress + '%';
+                
+                if (matchedPairs === 6) {
+                    setTimeout(() => {
+                        alert('¡Felicidades! ¡Has completado el juego! 🎉');
+                        showMainMenu();
+                    }, 1000);
+                }
+            } else {
+                // No coinciden
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+            }
+            
+            document.getElementById('memory-score').textContent = `Puntos: ${memoryScore}`;
+            flippedCards = [];
+        }
+
+        // Juego de Lluvia de Señitas
+        function initRainGame() {
+            rainScore = 0;
+            document.getElementById('rain-score').textContent = 'Puntos: 0';
+            
+            const words = Object.keys(gameData);
+            currentTargetWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById('target-word').textContent = gameData[currentTargetWord].word;
+            
+            startRain();
+        }
+
+        function startRain() {
+            const container = document.getElementById('rain-container');
+            
+            setInterval(() => {
+                if (document.getElementById('rain-game').classList.contains('active')) {
+                    createBubble();
+                }
+            }, 2000);
+        }
+
+        function createBubble() {
+            const container = document.getElementById('rain-container');
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            const words = Object.keys(gameData);
+            const isCorrect = Math.random() < 0.3; // 30% probabilidad de burbuja correcta
+            const word = isCorrect ? currentTargetWord : words[Math.floor(Math.random() * words.length)];
+            
+            bubble.innerHTML = `<div class="bubble-sign">${gameData[word].sign}</div>`;
+            bubble.dataset.word = word;
+            bubble.dataset.correct = isCorrect;
+            
+            if (isCorrect) {
+                bubble.classList.add('correct');
+            } else {
+                bubble.classList.add('incorrect');
+            }
+            
+            bubble.style.left = Math.random() * (container.offsetWidth - 90) + 'px';
+            bubble.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            
+            bubble.addEventListener('click', handleBubbleClick);
+            container.appendChild(bubble);
+            
+            // Remover burbuja después de la animación
+            setTimeout(() => {
+                if (bubble.parentNode) {
+                    bubble.parentNode.removeChild(bubble);
+                }
+            }, 7000);
+        }
+
+        function handleBubbleClick(e) {
+            const bubble = e.currentTarget;
+            const isCorrect = bubble.dataset.correct === 'true';
+            
+            if (isCorrect) {
+                bubble.classList.add('success');
+                bubble.innerHTML = '👍';
+                rainScore += 10;
+                createConfetti();
+                
+                // Cambiar palabra objetivo
+                setTimeout(() => {
+                    const words = Object.keys(gameData);
+                    currentTargetWord = words[Math.floor(Math.random() * words.length)];
+                    document.getElementById('target-word').textContent = gameData[currentTargetWord].word;
+                }, 1000);
+            } else {
+                bubble.classList.add('error');
+                bubble.innerHTML = '❌';
+            }
+            
+            document.getElementById('rain-score').textContent = `Puntos: ${rainScore}`;
+            
+            setTimeout(() => {
+                if (bubble.parentNode) {
+                    bubble.parentNode.removeChild(bubble);
+                }
+            }, 1000);
+        }
+
+        // Juego 3: Deletreo Mágico
+        function initSpellingGame() {
+            spellingScore = 0;
+            spellingProgress = [];
+            document.getElementById('spelling-score').textContent = 'Puntos: 0';
+            
+            const words = Object.keys(gameData);
+            currentSpellingWord = words[Math.floor(Math.random() * words.length)];
+            spellingProgress = new Array(currentSpellingWord.length).fill('_');
+            
+            document.getElementById('spelling-target').textContent = gameData[currentSpellingWord].word;
+            document.getElementById('spelling-progress').textContent = spellingProgress.join(' ');
+            
+            createAlphabetGrid();
+        }
+
+        function createAlphabetGrid() {
+            const grid = document.getElementById('alphabet-grid');
+            grid.innerHTML = '';
+            
+            Object.keys(alphabet).forEach(letter => {
+                const button = document.createElement('button');
+                button.className = 'letter-button';
+                button.innerHTML = `
+                    <div>${letter}</div>
+                    <div class="letter-sign">${alphabet[letter].sign}</div>
+                `;
+                button.dataset.letter = letter;
+                button.addEventListener('click', selectLetter);
+                grid.appendChild(button);
+            });
+        }
+
+        function selectLetter(e) {
+            const button = e.currentTarget;
+            const letter = button.dataset.letter;
+            
+            const targetWord = currentSpellingWord.toUpperCase();
+            let foundLetter = false;
+            
+            // Función para normalizar letras (quitar tildes y acentos)
+            function normalizeChar(char) {
+                return char.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            }
+            
+            // Buscar la siguiente posición vacía de esta letra (considerando tildes)
+            for (let i = 0; i < targetWord.length; i++) {
+                const targetChar = normalizeChar(targetWord[i]);
+                const inputChar = normalizeChar(letter);
+                
+                if (targetChar === inputChar && spellingProgress[i] === '_') {
+                    spellingProgress[i] = targetWord[i]; // Usar la letra original (con tilde si la tiene)
+                    foundLetter = true;
+                    spellingScore += 5;
+                    createConfetti();
+                    
+                    // Efecto visual de éxito
+                    button.style.background = 'linear-gradient(45deg, #32CD32, #98FB98)';
+                    button.style.transform = 'scale(1.1)';
+                    
+                    setTimeout(() => {
+                        button.style.background = '';
+                        button.style.transform = '';
+                    }, 800);
+                    
+                    break;
+                }
+            }
+            
+            // Si la letra no está en la palabra o ya se completaron todas las instancias
+            if (!foundLetter) {
+                button.style.background = '#FF6B6B';
+                button.style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    button.style.background = '';
+                    button.style.transform = '';
+                }, 800);
+            }
+            
+            // Actualizar la visualización del progreso
+            document.getElementById('spelling-progress').textContent = spellingProgress.join(' ');
+            document.getElementById('spelling-score').textContent = `Puntos: ${spellingScore}`;
+            
+            // Verificar si se completó la palabra
+            if (!spellingProgress.includes('_')) {
+                setTimeout(() => {
+                    alert('¡Excelente! ¡Has deletreado la palabra "' + gameData[currentSpellingWord].word + '"! 🎉');
+                    initSpellingGame(); // Nueva palabra
+                }, 1200);
+            }
+        }
+
+        // Juego 4: Familias de Señas
+        function initFamilyGame() {
+            familyScore = 0;
+            selectedFamilyCards = [];
+            document.getElementById('family-score').textContent = 'Puntos: 0';
+            
+            const categoryKeys = Object.keys(categories);
+            currentCategory = categoryKeys[Math.floor(Math.random() * categoryKeys.length)];
+            
+            document.getElementById('family-category').textContent = categories[currentCategory].name;
+            
+            createFamilyGrid();
+        }
+
+        function createFamilyGrid() {
+            const grid = document.getElementById('family-grid');
+            grid.innerHTML = '';
+            
+            // Mezclar palabras correctas e incorrectas
+            const correctWords = categories[currentCategory].words;
+            const allWords = Object.keys(gameData);
+            const incorrectWords = allWords.filter(word => !correctWords.includes(word))
+                                           .slice(0, 2); // 2 palabras incorrectas
+            
+            const mixedWords = [...correctWords, ...incorrectWords];
+            mixedWords.sort(() => Math.random() - 0.5);
+            
+            mixedWords.forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'family-card';
+                card.innerHTML = `
+                    <div class="family-emoji">${gameData[word].emoji}</div>
+                    <div class="family-word">${gameData[word].word}</div>
+                    <div class="family-sign">${gameData[word].sign}</div>
+                    <div class="family-description">${gameData[word].signDescription}</div>
+                `;
+                card.dataset.word = word;
+                card.dataset.correct = correctWords.includes(word);
+                card.addEventListener('click', selectFamilyCard);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectFamilyCard(e) {
+            const card = e.currentTarget;
+            const word = card.dataset.word;
+            const isCorrect = card.dataset.correct === 'true';
+            
+            if (card.classList.contains('correct') || card.classList.contains('incorrect')) {
+                return;
+            }
+            
+            if (isCorrect) {
+                card.classList.add('correct');
+                familyScore += 15;
+                selectedFamilyCards.push(word);
+                createConfetti();
+                
+                // Verificar si se completó la categoría
+                const correctWords = categories[currentCategory].words;
+                if (selectedFamilyCards.length === correctWords.length) {
+                    setTimeout(() => {
+                        alert('¡Fantástico! ¡Has encontrado toda la familia! 🎉');
+                        initFamilyGame(); // Nueva categoría
+                    }, 1000);
+                }
+            } else {
+                card.classList.add('incorrect');
+                setTimeout(() => {
+                    card.classList.remove('incorrect');
+                }, 1000);
+            }
+            
+            document.getElementById('family-score').textContent = `Puntos: ${familyScore}`;
+        }
+
+        // Efectos visuales
+        function createConfetti() {
+            const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'];
+            
+            for (let i = 0; i < 20; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    document.body.removeChild(confetti);
+                }, 3000);
+            }
+        }
+
+        // Inicializar el juego
+        window.addEventListener('load', () => {
+            showMainMenu();
+        });
+    </script>
+</body>
+</html>
